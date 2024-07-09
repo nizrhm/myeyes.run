@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>My Eyes Run</title>
+    <link rel="icon" href="myeyes.run/favicon.ico" type="image/x-icon">    
+    <style>
+        @import url('https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap');
+
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            font-family: 'Poppins', sans-serif;
+            background-color: #ffffff;
+            color: #333;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+        }
+
+        header {
+            position: absolute;
+            top: 20px;
+            width: 100%;
+            text-align: center;
+        }
+        header h1 {
+            font-size: 40px;
+            margin: 0;
+            font-weight: 400;
+        }
+        .container {
+            width: 90%;
+            max-width: 800px;
+            text-align: center;
+        }
+        #spreederOutput {
+            height: 85px;
+            margin-bottom: 20px;
+            font-size: 3.5em;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #f3f1f1;
+            border-radius: 16px;
+            border: 0px solid #ccc;
+        }
+        #spreederInput {
+            width: 80%;
+            height: 60px;
+            position: absolute;
+            bottom: 20px;
+            border: 1px solid #ccc;
+            border-radius: 16px;
+            padding: 10px 30px;
+            font-size: 1em;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            resize: none;
+        }
+        .controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            position: absolute;
+            bottom: 100px; /* Position controls just above input */
+            width: 100%;
+            padding-bottom: 20px; /* Padding between controls and input pane */
+        }
+        .controls select, .controls button, .controls input {
+            padding: 10px;
+            font-size: 1em;
+            border-radius: 8px;
+            border: 1px solid #ccc;
+            margin-right: 10px; /* Space between controls */
+        }
+        .controls button {
+            background: #000000;
+            color: #fff;
+            cursor: pointer;
+            border: none;
+        }
+        .controls button:disabled {
+            background: #ccc;
+            cursor: not-allowed;
+        }
+        .underline {
+            background-size: 1px 1em;
+            box-shadow: inset 0 -0.175em white, inset 0 -0.2em #000;
+            display: inline;
+        }
+        .underline--blue {
+            box-shadow:
+            inset 0 -0.175em white,
+            inset 0 -0.2em rgb(102, 239, 22);
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <div>
+            <h1 span class="text-shadow underline underline--blue">My Eyes Run</h1></span>
+        </div>
+        <div>
+            <span>Unlock your reading potential.</span>
+        </div>
+    </header>
+    <div class="container">
+        <div id="spreederOutput">Ready</div>
+    </div>
+    <div class="controls">
+        <select id="delaySelect">
+            <option value=".1">1/10 second (600 WPM)</option>
+            <option value=".2" selected>2/10 second (300 WPM)</option>
+            <option value=".3">3/10 second (200 WPM)</option>
+            <option value=".4">4/10 second (150 WPM)</option>
+            <option value=".5">5/10 second (120 WPM)</option>
+            <option value=".6">6/10 second (100 WPM)</option>
+            <option value=".7">7/10 second (86 WPM)</option>
+            <option value=".8">8/10 second (75 WPM)</option>
+            <option value=".9">9/10 second (67 WPM)</option>
+            <option value="1">1 second (60 WPM)</option>
+            <option value="custom">Custom</option>
+        </select>
+        <input type="number" id="customSpeedInput" placeholder="Custom WPM" min="1" style="display: none;">
+        <button id="spreedButton" onclick="spreed()">Spreed</button>
+        <input type="file" id="fileInput" accept=".pdf,.epub">
+        <button onclick="uploadFile()">Upload File</button>
+    </div>
+    <textarea id="spreederInput" placeholder="Enter text here..."></textarea>
+    <script>
+        let spreederOutput, spreederInput, delaySelect, customSpeedInput, spreedButton, wordsArray, timeoutArray;
+
+        function globals() {
+            spreederOutput = document.getElementById('spreederOutput');
+            spreederInput = document.getElementById('spreederInput');
+            delaySelect = document.getElementById('delaySelect');
+            customSpeedInput = document.getElementById('customSpeedInput');
+            spreedButton = document.getElementById('spreedButton');
+            wordsArray = [];
+            timeoutArray = [];
+
+            delaySelect.addEventListener('change', function () {
+                if (this.value === 'custom') {
+                    customSpeedInput.style.display = 'inline-block';
+                } else {
+                    customSpeedInput.style.display = 'none';
+                }
+            });
+        }
+
+        function spreed() {
+            let secPerWord;
+            if (delaySelect.value === 'custom') {
+                let wpm = customSpeedInput.value;
+                secPerWord = 60 / wpm;
+            } else {
+                secPerWord = delaySelect.value;
+            }
+            let delay = secPerWord * 1000;
+            wordsArray = spreederInput.value.split(" ");
+            timeoutArray.forEach(clearTimeout);
+            timeoutArray = [];
+
+            for (let i = 0; i < wordsArray.length; i++) {
+                timeoutArray[i] = setTimeout(() => {
+                    spreederOutput.innerHTML = wordsArray[i];
+                }, delay * i);
+            }
+
+            timeoutArray.push(setTimeout(() => {
+                spreederOutput.innerHTML = "Done!";
+            }, delay * wordsArray.length));
+
+            spreedButton.disabled = true;
+            setTimeout(() => {
+                spreedButton.disabled = false;
+            }, delay * wordsArray.length);
+        }
+
+        function uploadFile() {
+            const fileInput = document.getElementById('fileInput');
+            const file = fileInput.files[0];
+            
+            if (!file) {
+                alert('Please select a file.');
+                return;
+            }
+
+            if (file.type === 'application/pdf') {
+                // Handle PDF file
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    const contents = event.target.result;
+                    const text = contents.replace(/[\n\r]+/g, ' '); // Replace newlines with spaces for readability
+                    spreederInput.value = text;
+                };
+                reader.readAsText(file);
+            } else if (file.type === 'application/epub+zip') {
+                // Handle EPUB file (example, could be more complex)
+                alert('EPUB file handling is not implemented in this example.');
+            } else {
+                alert('Unsupported file type. Please upload a PDF or EPUB file.');
+            }
+        }
+
+        window.onload = globals;
+    </script>
+</body>
+</html>
