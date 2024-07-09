@@ -1,0 +1,95 @@
+<!doctype html>
+ 
+<head>
+<title>MyEyesRun</title>
+<style>
+body {
+	margin:5px;
+	margin-top:25px;
+	font-family:arial;
+	font-size:100%;
+	text-align:center;
+}
+#spreederOutput {
+	height:50px;
+	padding-top:25px;
+	margin-bottom:25px;
+	font-size:1.5em;
+}
+#spreederInput {
+	height:75px;
+	border:1px solid black;
+	width:300px;
+	margin:0 auto;
+	margin-bottom:25px;
+}
+#spreedButton {
+	margin-left:20px;
+}
+p {
+	margin:0 auto;
+	margin-top:30px;
+	width:70%;
+	min-width:600px;
+}
+</style>
+ 
+<script>
+function globals() {
+	spreederOutput = document.getElementById('spreederOutput');
+	spreederInput = document.getElementById('spreederInput');
+	delaySelect = document.getElementById('delaySelect');
+	spreedButton = document.getElementById('spreedButton');
+	wordsArray = [];
+	timeoutArray = [];
+	otherTimeouts = [];
+}
+function spreed(string,secPerWord) {
+	// timeouts are set in milliseconds
+	var delay = secPerWord * 1000;
+	// make array of each word
+	wordsArray = spreederInput.value.split(" ");
+	for (var i=0 ; i < wordsArray.length ; i++) {
+		timeoutArray[i] = setTimeout(function(){spreederOutput.innerHTML = wordsArray[0]}, delay * i);
+		setTimeout(function(){wordsArray.shift()}, delay * i);
+	}
+	// clear the display div when finished
+	setTimeout(function(){spreederOutput.innerHTML = ""}, delay * wordsArray.length);
+	// disable inputs until spreeding complete
+	spreedButton.disabled = true;
+	setTimeout(function(){spreedButton.disabled = false;}, delay * wordsArray.length);
+	spreederInput.disabled = true;
+	setTimeout(function(){spreederInput.disabled = false;}, delay * wordsArray.length);
+	delaySelect.disabled = true;
+	setTimeout(function(){delaySelect.disabled = false;}, delay * wordsArray.length);
+}
+</script>
+</head>
+ 
+<body onload="globals();">
+ 
+<h2>Spreeder</h2>
+ 
+<div id="spreederOutput"></div>
+ 
+<textarea id="spreederInput">The science behind this is rather interesting! And almost nonexistent! If you read single words at a time, then you should be able to ignore the speed changes of your inner voice because you will be following the tempo set by the spreeder.</textarea>
+ 
+<div id='optionsDiv'>
+	<label for='delaySelect'>Delay: </label>
+	<select id="delaySelect">
+		<option value='.1'>1/10 second (600 WPM)</option>
+		<option value='.2' selected>2/10 second (300 WPM)</option>
+		<option value='.3'>3/10 second (200 WPM)</option>
+		<option value='.4'>4/10 second (150 WPM)</option>
+		<option value='.5'>5/10 second (120 WPM)</option>
+		<option value='.6'>6/10 second (100 WPM)</option>
+		<option value='.7'>7/10 second (86 WPM)</option>
+		<option value='.8'>8/10 second (75 WPM)</option>
+		<option value='.9'>9/10 second (67 WPM)</option>
+		<option value='1'>1 second (60 WPM)</option>
+	</select>
+	<button id="spreedButton" onclick="spreed(spreederInput.value , delaySelect.options[delaySelect.selectedIndex].value);">Spreed</button>
+</div>
+</body>
+ 
+</html>
