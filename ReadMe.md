@@ -5,6 +5,5 @@ It utilizes HTML & CSS.
 Features -> 
     Simple, Minimal Design.
     Pause & Restart Options.
-    Dark/Light Themes.
 
     Completely FREE!
